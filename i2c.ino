@@ -4,6 +4,11 @@ unsigned char slave_add = 0x36;
 unsigned char angle1_add = 0x0C;
 unsigned char angle2_add = 0x0D;
 
+unsigned char answer;
+unsigned char answer2;
+unsigned int real;
+float real2;
+
 const long looptime = 10;
 unsigned long prevMicros = 0;
 unsigned long currMicros;
@@ -28,10 +33,8 @@ void loop() {
     Wire.requestFrom(slave_add, 2);    // Request 6 bytes from slave device number two
 
     if (Wire.available()) {
-      unsigned char answer = Wire.read();
-      unsigned char answer2 = Wire.read();
-      unsigned int real;
-      float real2;
+      answer = Wire.read();
+      answer2 = Wire.read();
       real = answer;
       real <<= 8;
       real |= answer2;
