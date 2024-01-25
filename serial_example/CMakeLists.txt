@@ -20,6 +20,8 @@ include_directories(
 add_executable(serial_example_node src/serial_example_node.cpp)
 add_executable(serial_example_node2 src/serial_example_node2.cpp)
 add_executable(ser_subscriber src/ser_subscriber.cpp)
+add_executable(ser_subscriber2 src/ser_subscriber2.cpp)
+add_executable(ser_pubsub src/ser_pubsub.cpp)
 target_link_libraries(serial_example_node
   ${catkin_LIBRARIES}
 )
@@ -29,4 +31,9 @@ target_link_libraries(serial_example_node2
 target_link_libraries(ser_subscriber
   ${catkin_LIBRARIES}
 )
-
+target_link_libraries(ser_subscriber2
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(ser_pubsub
+  ${catkin_LIBRARIES}
+)
