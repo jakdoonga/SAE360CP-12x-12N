@@ -81,8 +81,9 @@ uint16_t readEncoder(uint16_t TcaAddr, uint16_t EncAddr, uint8_t *buffer, uint8_
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t buf[12];
-//uint16_t raw;
-uint16_t ang[9];
+uint16_t raw;
+uint8_t ang[37];
+
 uint32_t curr;
 uint32_t prev;
 /* USER CODE END 0 */
@@ -93,25 +94,11 @@ uint32_t prev;
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
   /* Configure the system clock */
   SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
@@ -126,29 +113,31 @@ int main(void)
   prev = HAL_GetTick();
   while (1)
   {
-	  curr = HAL_GetTick();
-	  if((curr-prev) >= 10)
-	  {
-		  //--------TCA 1
-		  ang[0] = readEncoder(TCA_ADDR, ENC_ADDR, buf, &bus0);
+    /* USER CODE END WHILE */
+	memset(buf, 0, sizeof(buf));
+	memset(ang, 0, sizeof(ang));
+	curr = HAL_GetTick();
+	if((curr-prev) >= 10)
+	{
+		//-----TCA 1
+		raw = readEncoder(TCA_ADDR, ENC_ADDR, buf, &bus0);
+		sprintf((char*)&ang[0], "%04u", raw);
+		memset(&raw, 0, sizeof(raw));
 
-		  //--------TCA 2
-		  ang[1] = readEncoder(TCA_ADDR2, ENC_ADDR, buf, &bus0);
-		  ang[2] = readEncoder(TCA_ADDR2, ENC_ADDR, buf, &bus2);
+		//-----TCA 2
+		raw = readEncoder(TCA_ADDR2, ENC_ADDR, buf, &bus0);
+		sprintf((char*)&ang[4], "%04u", raw);
+		memset(&raw, 0, sizeof(raw));
 
-		  printf("ang1 = %u\r\n",ang[0]);
-		  printf("ang2 = %u\r\n",ang[1]);
-		  printf("ang3 = %u\r\n",ang[2]);
-		  printf("\r\n");
+		// UART Tx
+		HAL_UART_Transmit(&huart2, ang, strlen((char*)ang), 10);
 
-		  // Reset time
-		  prev = curr;
-		  HAL_Delay(200);
-	  }// one period end
-
-  }/* USER CODE END WHILE */
-
-  /* USER CODE BEGIN 3 */
+		// Reset time
+		prev= curr;
+	}// 1 period end
+	HAL_Delay(250);
+    /* USER CODE BEGIN 3 */
+  }
   /* USER CODE END 3 */
 }
 
@@ -330,6 +319,7 @@ void Wait()
 {
 	while(HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY){};
 }
+
 uint16_t readEncoder(uint16_t TcaAddr, uint16_t EncAddr, uint8_t *buffer, uint8_t *busid)
 {
 	uint16_t temp;
